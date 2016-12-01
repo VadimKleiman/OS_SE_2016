@@ -64,7 +64,7 @@ void HandlerInt(struct frame* param)
 		case 29: printf("%s %d: %s\n", "Interrupt code ", 29, "Reserved"); break;
 		case 30: printf("%s %d: %s\n", "Interrupt code ", 30, "Reserved"); break;
 		case 31: printf("%s %d: %s\n", "Interrupt code ", 31, "Reserved"); break;
-		case 32: printf("%s\n", "Hello!"); out8(0x20,32); out8(0xA0,32); return; break;
+		case 32: printf("%s\n", "Hello!"); out8(0x20,32); return; break;
 	}
 	printf("%s\n", "------------------------------------------");
 	printf("|%s\t|\t%s            |\n", "Register", "Value");
