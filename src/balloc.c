@@ -17,7 +17,7 @@ struct mboot_mmap_entry {
 	uint32_t type;
 } __attribute__((packed));
 
-spinlock_t slock;
+static spinlock_t slock_balloc;
 
 #define BALLOC_MAX_RANGES	128
 static struct memory_node balloc_nodes[BALLOC_MAX_RANGES];
@@ -120,7 +120,7 @@ static void __balloc_remove_range(struct rb_tree *tree,
 uintptr_t __balloc_alloc(size_t size, uintptr_t align,
 			uintptr_t from, uintptr_t to)
 {
-	lock(&slock);
+	lock(&slock_balloc);
 	struct rb_tree *tree = &free_ranges;
 	struct rb_node *link = tree->root;
 	struct memory_node *ptr = 0;
@@ -150,13 +150,13 @@ uintptr_t __balloc_alloc(size_t size, uintptr_t align,
 			if (ptr->end > addr + size)
 				__balloc_add_range(tree, addr + size, ptr->end);
 			balloc_free_node(ptr);
-			unlock(&slock);
+			unlock(&slock_balloc);
 			return addr;
 		}
 
 		ptr = RB2MEMORY_NODE(rb_next(&ptr->link.rb));
 	}
-	unlock(&slock);
+	unlock(&slock_balloc);
 	return to;
 }
 
@@ -176,9 +176,9 @@ uintptr_t balloc_alloc(size_t size, uintptr_t from, uintptr_t to)
 
 void balloc_free(uintptr_t begin, uintptr_t end)
 {
-	lock(&slock);
+	lock(&slock_balloc);
 	__balloc_add_range(&free_ranges, begin, end);
-	unlock(&slock);
+	unlock(&slock_balloc);
 }
 
 
